@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная карта</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="route-buttons" id="route-buttons">
+        <button class="btn" id="chief">Отдел главного врача</button>
+        <button class="btn" id="management">Дирекция</button>
+        <button class="btn" id="AdultСlinic">Взрослая поликлиника</button>
+        <button class="btn" id="hospitalizationWaitingRoom">Зал ожидания госпитализации</button>
+        <button class="btn" id="adultReceptionDepartment">Взрослое приемное отделение</button>
+        <button class="btn none" id="mainBuilding">Главный корпус</button>
+        <button class="btn" id="childrenDepartment">Детское приемное отделение (поликлиника)</button>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
