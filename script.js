@@ -1,390 +1,332 @@
-const initialFocus = [55.819931, 37.529315];
-const initialZoom = 18;
-const map = L.map('map', {
-    center: initialFocus,
-    zoom: initialZoom,
-    minZoom: 17,
-    maxZoom: 18,
-    zoomControl: false
-});
+$(document).ready(function() {
+  // Запрет на ввод пробелов в полях
+  $("input[name='stateNumber'], input[name='stateNumberSearch']").on('input', function() {
+      this.value = this.value.replace(/\s/g, ''); // Удаляем пробелы из значения полей
+  });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-}).addTo(map);
+  $("input[name='entryDate'], input[name='outDate'], input[data-field='entry_date'], input[data-field='out_date']").on('input', function() {
+    const input = this;
+    const value = input.value;
 
-const southWest = L.latLng(55.817240, 37.537840);
-const northEast = L.latLng(55.821547, 37.523271);
-const bounds = L.latLngBounds(southWest, northEast);
-
-map.setMaxBounds(bounds);
-
-map.on('dragend', function () {
-    if (!bounds.contains(map.getCenter())) {
-        map.setView(bounds.getCenter());
+    // Регулярное выражение для проверки формата даты (YYYY-MM-DD)
+    const dateParts = value.split('-');
+    if (dateParts[0] && dateParts[0].length > 4) {
+        dateParts[0] = dateParts[0].slice(0, 4); // Ограничиваем только год до 4 цифр
     }
+    // Объединяем дату обратно
+    input.value = dateParts.join('-'); 
 });
 
-const routeCoords = {
-    chief: [
-        [55.819445, 37.528900],
-        [55.819520, 37.528900],
-        [55.819560, 37.529235],
-        [55.819690, 37.529248],
-        [55.820045, 37.529670],
-        [55.820245, 37.529595],
-        [55.820335, 37.529685],
-        [55.820360, 37.529890],
-        [55.820337, 37.530050],
-        [55.820220, 37.530155],
-        [55.820195, 37.529970],
-    ],
-    management: [
-        [55.819445, 37.528900],
-        [55.819520, 37.528900],
-        [55.819560, 37.529235],
-        [55.819690, 37.529248],
-        [55.820045, 37.529670],
-        [55.820245, 37.529595],
-        [55.820335, 37.529685],
-        [55.820360, 37.529890],
-        [55.820337, 37.530050],
-        [55.820220, 37.530155],
-        [55.820195, 37.529970],
-    ],
-    hospitalizationWaitingRoom: [
-        [55.819445, 37.528900],
-        [55.819520, 37.528900],
-        [55.819560, 37.529235],
-        [55.819690, 37.529248],
-        [55.820045, 37.529670],
-        [55.820245, 37.529595],
-        [55.820335, 37.529685],
-        [55.820360, 37.529890],
-        [55.820337, 37.530050],
-        [55.820170, 37.530200],
-        [55.820275, 37.531100],
-        [55.820612, 37.530990],
-        [55.820593, 37.530820],
-    ],
-    AdultСlinic: [
-        [55.819445, 37.528900],
-        [55.819520, 37.528900],
-        [55.819520, 37.528887],
-        [55.819560, 37.528873],
-        [55.819600, 37.528825],
-        [55.819635, 37.528696],
-        [55.819635, 37.528605],
-        [55.819665, 37.528605], 
-    ],
-    adultReceptionDepartment: [
-        [55.819445, 37.528900],
-        [55.819520, 37.528900],
-        [55.819560, 37.529235],
-        [55.819690, 37.529248],
-        [55.820045, 37.529670],
-        [55.820245, 37.529595],
-        [55.820335, 37.529685],
-        [55.820360, 37.529890],
-        [55.820337, 37.530050],
-        [55.820170, 37.530200],
-        [55.820275, 37.531100],
-        [55.820558, 37.531005],
-        [55.820625, 37.531683],
-        [55.820386, 37.531540],   
-    ],
-    mainBuilding: [
-        [55.819445, 37.528900],
-        [55.819520, 37.528900],
-        [55.819560, 37.529235],
-        [55.819690, 37.529248],
-        [55.820045, 37.529670],
-        [55.820245, 37.529595],
-        [55.820335, 37.529685],
-        [55.820360, 37.529890],
-        [55.820337, 37.530050],
-        [55.820170, 37.530200],
-        [55.820228, 37.530707],
-        [55.820160, 37.530725],
-    ],
-    childrenDepartment: [
-        [55.819445, 37.528900],
-        [55.819440, 37.528753],
-        [55.819230, 37.528820],
-        [55.819340, 37.529995],
-        [55.818785, 37.530260],
-        [55.818897, 37.531190],
-        [55.818963, 37.531166],
-    ],
-    education: [
-        [55.819445, 37.528900],
-        [55.819440, 37.528753],
-        [55.819230, 37.528820],
-        [55.819320, 37.529768],
-        [55.819400, 37.529747],
-    ],
-};
 
-let isAnimating = false;
-let endMarker = null;
-const routes = {};
+$("#carForm").submit(function(event) {
+    event.preventDefault(); // Избегаем обычной отправки формы
 
-function interpolatePoints(points, steps) {
-    const interpolated = [];
-    for (let i = 0; i < points.length - 1; i++) {
-        const start = points[i];
-        const end = points[i + 1];
-        interpolated.push(start);
-        for (let j = 1; j < steps; j++) {
-            const lat = start[0] + (end[0] - start[0]) * (j / steps);
-            const lng = start[1] + (end[1] - start[1]) * (j / steps);
-            interpolated.push([lat, lng]);
+    const carMake = $("input[name='carMake']").val().trim();
+    const stateNumber = $("input[name='stateNumber']").val().trim();
+    const driverLastName = $("input[name='driverLastName']").val().trim();
+    const fullNameApplicant = $("input[name='fullNameApplicant']").val().trim();
+    const entryDate = $("#entryDate").val();
+    const outDate = $("#outDate").val();
+    const comment = $("textarea[name='comment']").val().trim();
+    const inspection = $("input[name='inspection']").is(':checked') ? 1 : 0;
+    const yearRecord = $("input[name='yearRecord']").is(':checked') ? 1 : 0; // Значение чекбокса
+
+    // Проверка: если все поля пустые
+    if (!carMake && !stateNumber && !driverLastName && !fullNameApplicant &&
+        !entryDate && !outDate && !comment) {
+        Swal.fire({
+            text: "Пожалуйста, заполните хотя бы одно поле!",
+            icon: "warning",
+            showConfirmButton: false,
+            timer: 2000,
+            backdrop: false // Отключаем затемнение фона
+        });
+        return; // Прерываем дальнейшее выполнение функции
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "record.php",
+        data: $(this).serialize(), // Добавляем годовую запись
+        success: function(response) {
+            Swal.fire({
+                text: response,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000,
+                backdrop: false // Отключаем затемнение фона
+            });
+            if (!yearRecord) {
+                $("#carForm")[0].reset(); // Сбрасываем форму только если yearRecord не отмечен
+            }
+            loadLastRecords(); // Обновляем таблицу
+
+      
+        },
+        error: function() {
+            Swal.fire({
+                text: "Произошла ошибка при отправке данных. 🥺",
+                icon: "error",
+                showConfirmButton: false,
+                timer: 2000,
+                backdrop: false // Отключаем затемнение фона
+            });
         }
-    }
-    interpolated.push(points[points.length - 1]);
-    return interpolated;
-}
-
-for (const key in routeCoords) {
-    routes[key] = {
-        coords: interpolatePoints(routeCoords[key], 20),
-        polyline: L.polyline([], { color: 'blue', opacity: 0.5 }).addTo(map)
-    };
-}
-
-const startMarkerIcon = L.icon({
-    iconUrl: './img/kiosk.svg',
-    iconSize: [32, 40],
-    iconAnchor: [16, 32],
-    popupAnchor: [78, 40]
+    });
 });
 
-const endMarkerIcon = L.icon({
-    iconUrl: './img/door.svg',
-    iconSize: [32, 40],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32]
-});
+  // Обработка удаления записи
+  $(document).on('click', '.delete-btn', function() {
+      const button = $(this);
+      const id = button.data('id');
 
-const customPopupContent = `
-    <div style="text-align: center;">
-        <h3>Вы здесь</h3>
-    </div>
-`;
+      Swal.fire({
+          text: "Вы уверены, что хотите удалить эту запись!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Подтвердить',
+          cancelButtonText: 'Отмена'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  type: "POST",
+                  url: "delete_record.php",
+                  data: { id: id },
+                  success: function(response) {
+                      Swal.fire({
+                          text: response,
+                          icon: "success",
+                          showConfirmButton: false,
+                          timer: 2000
+                      });
+                      button.closest('tr').remove();
+                      loadLastRecords(); // Обновляем таблицу
+                  },
+                  error: function() {
+                      Swal.fire({
+                          text: "Произошла ошибка при удалении записи. 🥺",
+                          icon: "error",
+                          showConfirmButton: false,
+                          timer: 2000,
+                          backdrop: false // Отключаем затемнение фона
+                      });
+                  }
+              });
+          }
+      });
+  });
 
-const startMarker = L.marker(routeCoords.chief[0], { icon: startMarkerIcon })
-    .addTo(map)
-    .bindPopup(customPopupContent)
-    .openPopup();
+  // Обработчик для кнопки поиска
+  $("#searchBtn").click(function() {
+      $('.search').removeClass('none'); // Отображаем панель поиска
+      $('.choice').addClass('none'); // Скрываем основную панель
+      $('.new-entry__btn-back').removeClass('none');
+      $('.logo').addClass('none');
+      loadAllRecords(); 
+  });
 
-function animateRoute(routeKey) {
-    if (isAnimating) return;
-    isAnimating = true;
-
-    map.setView(initialFocus, initialZoom);
-
-    for (const key in routes) {
-        routes[key].polyline.setLatLngs([]);
-    }
-
-    if (endMarker) {
-        map.removeLayer(endMarker);
-        endMarker = null;
-    }
-
-    const buttonsContainer = document.querySelector('#route-buttons');
-    buttonsContainer.classList.add('hidden');
-
-    startMarker.closePopup();
-
-    routes[routeKey].polyline.setLatLngs([]);
-    let index = 0;
-    const speed = 20;
-
-    const interval = setInterval(() => {
-        if (index < routes[routeKey].coords.length) {
-            routes[routeKey].polyline.addLatLng(routes[routeKey].coords[index]);
-            index++;
-        } else {
-            clearInterval(interval);
-
-            const endCoords = routes[routeKey].coords[routes[routeKey].coords.length - 1];
-
-            endMarker = L.marker(endCoords, { icon: endMarkerIcon })
-                .addTo(map).openPopup();
-
-            setTimeout(() => {
-                map.setView(endCoords, map.getZoom());
-            }, 100);
-
-            startMarker.openPopup();
-            buttonsContainer.classList.remove('hidden');
-            isAnimating = false;
-        }
-    }, speed);
-}
-
-function resetMap() {
-    if (endMarker) {
-        map.removeLayer(endMarker);
-        endMarker = null;
-    }
-
-    for (const key in routes) {
-        routes[key].polyline.setLatLngs([]);
-    }
-
-    startMarker.openPopup();
-    map.setView(initialFocus, initialZoom);
-}
-
-let inactivityTimer = null;
-let hideCount = 0; 
-function showInactivityScreen() {
-    document.querySelector('#inactivity-screen').classList.remove('hidden');
-    hideCount++;
-    document.querySelector('.counter').textContent = `${hideCount}`;
-    hideAllSections(); 
-    resetMap();
-}
-
-function hideInactivityScreen() {
-    document.querySelector('#inactivity-screen').classList.add('hidden');  
-}
-
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    hideInactivityScreen();
-    inactivityTimer = setTimeout(showInactivityScreen, 60000); 
-}
-
-document.addEventListener('mousemove', resetInactivityTimer);
-document.addEventListener('keypress', resetInactivityTimer);
-document.addEventListener('click', resetInactivityTimer);
-document.addEventListener('touchstart', resetInactivityTimer);
-
-document.querySelector("#toggleButton").addEventListener("click", function() {
-    const infoWrap = document.querySelector(".info__wrap");
-    const infoContent = document.querySelector(".info__content");
-    const infoTitle = document.querySelector('.info__title');
-    const svgIcon = document.querySelector('.svg__icon');
-
-    infoWrap.classList.toggle("active");
-    infoContent.classList.toggle("active");
-
-    if (infoTitle.classList.contains('hidden')) {
-        infoTitle.classList.remove('hidden');
-        infoTitle.classList.add('visible');
-    } else {
-        infoTitle.classList.remove('visible');
-        infoTitle.classList.add('hidden');
-    }
-
-    svgIcon.classList.toggle('flipped');
-});
-
-function hideAllSections() {
-  hideEducationContent(); 
-  hideInfo(); 
-}
-
-function hideEducationContent() {
-  const educationContent = document.querySelector('.education-content');
-  if (educationContent.classList.contains('active')) {
-      educationContent.classList.remove('active');
+  // Функция для загрузки всех записей
+  function loadAllRecords() {
+      $.ajax({
+          type: "GET",
+          url: "get_all_records.php", // Убедитесь, что этот путь правильный
+          success: function(response) {
+              $("#results").html(response); // Заполняем блок results данными
+              updateAllRowColors(); // Обновляем цвета строк
+          },
+          error: function() {
+              Swal.fire({
+                  text: "Ошибка при получении записей. 🥺",
+                  icon: "error",
+                  showConfirmButton: false,
+                  timer: 2000,
+                  backdrop: false // Отключаем затемнение фона
+              });
+          }
+      });
   }
-}
 
-function hideInfo() {
-    const infoWrap = document.querySelector(".info__wrap");
-    const infoContent = document.querySelector(".info__content");
-    const infoTitle = document.querySelector('.info__title');
-    const svgIcon = document.querySelector('.svg__icon');
+  // Обработка формы поиска
+  $("#carForm2").submit(function(event) {
+      event.preventDefault(); // Избегаем обычной отправки формы
 
-    if (infoWrap.classList.contains("active")) {
-        infoWrap.classList.remove("active");
-        infoContent.classList.remove("active");
-        infoTitle.classList.remove('visible');
-        infoTitle.classList.add('hidden');
-        svgIcon.classList.remove('flipped');
-    }
-}
+      $.ajax({
+          type: "POST",
+          url: "display_coincidences.php", // Убедитесь, что этот путь правильный
+          data: $(this).serialize(),
+          success: function(response) {
+              $("#results").html(response); // Вставляем полученные данные в блок results
+              updateAllRowColors(); // Обновляем цвета строк на основании значения inspection
+          },
+          error: function() {
+              Swal.fire({
+                  text: "Произошла ошибка при выполнении поиска. 🥺",
+                  icon: "error",
+                  showConfirmButton: false,
+                  timer: 2000,
+                  backdrop: false // Отключаем затемнение фона
+              });
+          }
+      });
+  });
 
-document.addEventListener('click', function(event) {
-    const infoWrap = document.querySelector(".info__wrap");
-    if (infoWrap.classList.contains("active") && !infoWrap.contains(event.target) && event.target !== document.querySelector("#toggleButton")) {
-        hideInfo();
-    }
-});
+  // Обработчики событий для переключения панелей
+  const newEntryPanel = document.querySelector('.new-entry');
+  const newEntryBtn = document.querySelector('#entryBtn');
+  const choicePanel = document.querySelector('.choice');
+  const newEntryBtnBack = document.querySelector('#newEntryBtnBack');
+  const search = document.querySelector('.search');
+  const resultsContainer = document.querySelector('#results');
+  const logo = document.querySelector('.logo');
 
-document.querySelector('#education-info').addEventListener('click', function() {
-  const educationContent = document.querySelector('.education-content');
-  const isActive = educationContent.classList.contains('active');
+  newEntryBtn.addEventListener('click', () => {
+      newEntryPanel.classList.remove('none');
+      choicePanel.classList.add('none');
+      newEntryBtnBack.classList.remove('none');
+      logo.classList.add('none');
+      loadLastRecords(); // Загружаем последние записи
+  });
 
-  if (isActive) {
-      educationContent.classList.remove('active');
-  } else {
-      educationContent.classList.add('active');
+  newEntryBtnBack.addEventListener('click', () => {
+      newEntryPanel.classList.add('none');
+      choicePanel.classList.remove('none');
+      newEntryBtnBack.classList.add('none');
+      search.classList.add('none');
+      logo.classList.remove('none');
+      resultsContainer.innerHTML = ''; // Очищаем результаты
+  });
+
+  // Обработчик клика на кнопку редактирования
+  $(document).on('click', '.edit-btn', function() {
+      const row = $(this).closest('tr');
+      row.addClass('highlight'); 
+      row.find('.edit-field').prop('disabled', false);
+      $(this).hide();
+      row.find('.save-btn').show();
+  });
+
+  $(document).on('click', '.save-btn', async function() {
+      const row = $(this).closest('tr');
+      row.removeClass('highlight'); 
+      const id = row.data('id');
+
+      const yearRecord = row.find('input[data-field="year_record"]').is(':checked') ? 1 : 0;
+
+      const data = {
+          id: id,
+          car_make: row.find('input[data-field="car_make"]').val().trim(),
+          state_number: row.find('input[data-field="state_number"]').val().trim(),
+          driver_last_name: row.find('input[data-field="driver_last_name"]').val().trim(),
+          full_name_applicant: row.find('input[data-field="full_name_applicant"]').val().trim(),
+          entry_time: row.find('input[data-field="entry_time"]').val(),
+          out_time: row.find('input[data-field="out_time"]').val(),
+          entry_date: row.find('input[data-field="entry_date"]').val(),
+          out_date: row.find('input[data-field="out_date"]').val(),
+          comment: row.find('textarea[data-field="comment"]').val().trim(),
+          inspection: row.find('input[data-field="inspection"]').is(':checked') ? 1 : 0,
+          year_record: yearRecord
+      };
+
+      // Проверки на пустые поля
+      if (!data.car_make && !data.state_number && !data.driver_last_name && 
+          !data.full_name_applicant && !data.comment && !data.entry_date && !data.out_date) {
+          Swal.fire({
+              text: "Пожалуйста, заполните хотя бы одно поле!",
+              icon: "warning",
+              showConfirmButton: false,
+              timer: 2000,
+              backdrop: false // Отключаем затемнение фона
+          });
+          return; 
+      }
+
+      // Валидация даты
+      const entryYear = data.entry_date.split('-')[0]; 
+      const outYear = data.out_date.split('-')[0];
+
+      if (entryYear.length > 4 || outYear.length > 4) {
+          Swal.fire({
+              text: "Введите корректную дату.",
+              icon: "error",
+              showConfirmButton: false,
+              timer: 2000,
+              backdrop: false // Отключаем затемнение фона
+          });
+          return; 
+      }
+
+      try {
+          const response = await $.ajax({
+              type: "POST",
+              url: "update_record.php",
+              data: data
+          });
+          Swal.fire({
+              text: "Данные успешно обновлены!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 2000,
+              backdrop: false // Отключаем затемнение фона
+          });
+
+          // Обновляем цвет строки
+          updateRowColors(row, data.inspection);
+
+          row.find('.edit-field').prop('disabled', true);
+          row.find('.edit-btn').show();
+          row.find('.save-btn').hide();
+      } catch (error) {
+          console.error("Ошибка при запросе: ", error);
+          Swal.fire({
+              text: "Ошибка при обновлении данных. 🥺",
+              icon: "error",
+              showConfirmButton: false,
+              timer: 2000,
+              backdrop: false // Отключаем затемнение фона
+          });
+      }
+  });
+
+  // Функция для обновления цвета строки
+  function updateRowColors(row, inspection) {
+      if (inspection == 1) {
+          row.css('background-color', 'rgb(218, 215, 91)'); // Цвет для "Без досмотра" активен
+      } else {
+          row.css('background-color', ''); // Сбрасываем цвет
+      }
   }
-  
-  hideInfo();
-});
 
-// кнопка для разработки нового маршрута
-document.querySelector('#showRouteButton').addEventListener('click', () => {
-  const routeKey = 'education'; 
-  resetMap(); 
-  
-  routes[routeKey].polyline.setLatLngs(routes[routeKey].coords);
-  const endCoords = routes[routeKey].coords[routes[routeKey].coords.length - 1];
-
-  if (endMarker) {
-      map.removeLayer(endMarker);
+  // Функция для обновления цветов строк
+  function updateAllRowColors() {
+      $('#results tr').each(function() {
+          const inspection = $(this).find('input[data-field="inspection"]').is(':checked');
+          if (inspection) {
+              $(this).css('background-color', 'rgb(218, 215, 91)'); // Устанавливаем жёлтый для "Без досмотра"
+          } else {
+              $(this).css('background-color', ''); // Сбрасываем цвет
+          }
+      });
   }
-  
-  endMarker = L.marker(endCoords, { icon: endMarkerIcon }).addTo(map).openPopup();
-  map.setView(endCoords, map.getZoom());
+
+  // Функция для загрузки последних записей
+  function loadLastRecords() {
+      $.ajax({
+          type: "GET",
+          url: "get_last_records.php", // Убедитесь, что файл доступен
+          success: function(response) {
+              $("#results").html(response); // Вставляем полученные данные в блок results
+          },
+          error: function() {
+              Swal.fire({
+                  text: "Ошибка при получении записей. 🥺",
+                  icon: "error",
+                  showConfirmButton: false,
+                  timer: 2000,
+                  backdrop: false // Отключаем затемнение фона
+              });
+          }
+      });
+  }
 });
-
-function getMonthWithDeclension(monthIndex) {
-  const monthGenitive = {
-      1: "января",  2: "февраля", 3: "марта", 
-      4: "апреля",  5: "мая",     6: "июня", 
-      7: "июля",    8: "августа", 9: "сентября", 
-      10: "октября",11: "ноября", 12: "декабря"
-  };
-
-  return monthGenitive[monthIndex]; // Возвращаем название месяца в родительном падеже
-}
-
-function updateTime() {
-  const today = new Date();
-  
-  // Форматирование времени
-  let hours = today.getHours();
-  let minutes = today.getMinutes();
-  
-  hours = hours < 10 ? "0" + hours : hours;
-  minutes = minutes < 10 ? "0" + minutes : minutes;
-  
-  // Форматирование даты
-  const daysOfWeek = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
-  
-  const dayOfWeek = daysOfWeek[today.getDay()];
-  const day = today.getDate();
-  const monthIndex = today.getMonth() + 1; // Месяцы начинаются с нуля
-  
-  const monthDeclension = getMonthWithDeclension(monthIndex);
-  
-  document.querySelector('#time').innerHTML = hours + ":" + minutes;
-  document.querySelector('#date').innerHTML = `${dayOfWeek}, ${day} ${monthDeclension}`;
-}
-
-setInterval(updateTime, 1000);
-
-document.querySelector('#chief').addEventListener('click', () => { animateRoute('chief'); hideInfo(); hideAllSections(); });
-document.querySelector('#hospitalizationWaitingRoom').addEventListener('click', () => { animateRoute('hospitalizationWaitingRoom'); hideInfo(); hideAllSections(); });
-document.querySelector('#AdultСlinic').addEventListener('click', () => { animateRoute('AdultСlinic'); hideInfo(); hideAllSections(); });
-document.querySelector('#adultReceptionDepartment').addEventListener('click', () => { animateRoute('adultReceptionDepartment'); hideInfo(); hideAllSections(); });
-document.querySelector('#mainBuilding').addEventListener('click', () => { animateRoute('mainBuilding'); hideInfo(); hideAllSections(); });
-document.querySelector('#childrenDepartment').addEventListener('click', () => { animateRoute('childrenDepartment'); hideInfo(); hideAllSections(); });
-document.querySelector('#education').addEventListener('click', () => { animateRoute('education'); hideInfo(); hideAllSections(); });
