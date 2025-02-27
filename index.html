@@ -9,67 +9,86 @@
 </head>
 <body>
 
-<div id="inactivity-screen" class="">
+  <div id="inactivity-screen" class="">
+    <!-- <img src="./img/new-year-bg.jpg" alt="Inactivity Background" class="background-image"> -->
+    <!-- <div class="snowman"> <img class="snowman__svg" src="./img/snowman.svg"></img> <img class="snowman__speech-balloon" src="./img/speech-balloon.svg" alt=""></div> -->
+    <!-- <img src="./img/8march.png" alt="Inactivity Background" class="background-image"> -->
     <video autoplay muted loop class="background-video">
-        <source src="./img/background-video-4k.mp4" type="video/mp4">
-        Ошибка
-    </video>
-    <div class="date-time">
-        <p class="date" id="date"></p>
-        <p class="time" id="time"></p>
-    </div>
+      <source src="./img/background-video-4k.mp4" type="video/mp4">
+      Ошибка
+  </video>
+  <div class="date-time">
+    <p class="date" id="date"></p>
+    <p class="time" id="time"></p>
+  </div>
     <div class="message">
         <h1>Интерактивная карта</h1>
-        <p>Нажмите, чтобы продолжить.</p>
+        <p>Нажмите, чтобы продолжить</p>
     </div>
+    <!-- <img class="star" src="./img/23star.png" alt=""> -->
+
     <p class="counter"></p>
 </div>
-<div class="info__wrap">
+  <div class="info__wrap">
     <div class="info__header" id="toggleButton">
-        <img src="img/info.svg" alt="Toggle Icon" class="svg__icon" />
-        <div class="info__title hidden">Дополнительная информация</div>
+      <img src="img/info.svg" alt="Toggle Icon" class="svg__icon" />
+      <div class="info__title hidden">Дополнительная информация</div>
     </div>
     <div class="info__content">
-        <p class="info-text">Посетите наш официальный сайт.</p>
-        <div class="qr"><img style="width: 150px;" src="./img/qr-code2.png" alt=""></div>
-        <p class="info-text">Горячая линия колл-центра:</p>
-        <p class="info-text">8 (495) 744-40-10</p>
-        <p class="info-text">Если вам требуется помощь дежурного травматолога, воспользуйтесь кнопкой справа от экрана.</p>
-    </div>
-</div>
-<div class="route-buttons" id="route-buttons">
-    <button class="btn none" id="showRouteButton">Показать тестовый маршрут</button>
-    <button class="btn " id="chief"><div class="btn__text"><p>Дирекция /<br>Отдел главного врача</p><p class="korp">Корпус 6, подъезд 3</p></div></button>
-    <button class="btn " id="AdultСlinic"><div class="btn__text"><p>Взрослая поликлиника</p><p class="korp">Корпус 1</p></div></button>
-    <button class="btn " id="hospitalizationWaitingRoom"><div class="btn__text"><p>Зал ожидания госпитализации</p><p class="korp">Корпус 5</p></div></button>
-    <button class="btn " id="adultReceptionDepartment"><div class="btn__text"><p>Взрослое приемное отделение</p><p class="korp">Корпус 6, подъезд 1</p></div></button>
-    <button class="btn none" id="mainBuilding"><div class="btn__text"><p>Главный корпус</p><p class="korp">Корпус 6, подъезд 2</p></div></button>
-    <button class="btn " id="childrenDepartment"><div class="btn__text"><p>Детское приемное отделение (поликлиника)</p><p class="korp">Корпус 7, подъезд 9</p></div></button>
-    <button class="btn" id="education-info"><div class="btn__text"><p>Управление по образовательной деятельности</p><p class="korp">Корпус 10, подъезд 7</p></div></button>
-    <div class="education-content hidden">
-        <div class="qr qr-education"><img style="width: 150px;" src="./img/qr-education.png" alt=""></div>
-        <p class="education-info__text"><b>Ординатура. Аспирантура. ДПО</b>. Очное обучение, стажировки на рабочем месте, симуляционные тренинги и кадаверные курсы.</p>
-        <div class="education-info__phone-wrap">
-            <img style="width: 30px;" src="./img/education-phone.png" alt="">
-            <p>+7 (499) 153-12-42</p>
-        </div>
-        <div class="education-info__mail-wrap">
-            <svg class="education-info-svg" width="30" viewBox="0 0 20 20">
-                <use href="./img/education-mail.svg#mail"></use>
-            </svg>
-            <p>edu@cito-priorov.ru</p>
-        </div>
-        <div class="education-info__address-wrap">
-            <img style="height: 33.33px; width: 25px;" src="./img/educaton-address.png" alt="">
-            <p>г. Москва, ул. Приорова, д. 10, 
-                подъезд 7, 2 этаж, кабинет 211</p>
-        </div>
-        <button class="btn btn-test" id="education">Построить маршрут</button>
-    </div>
-</div>
-<div id="map"></div>
+      <p class="info-text">Посетите наш официальный сайт.</p>
+      <div class="qr"><img style="width: 150px;" src="./img/qr-code2.png" alt=""></div>
+      <p class="info-text">Горячая линия колл-центра:</p>
+      <p class="info-text">+7 (495) 744-40-10</p>
+      <p class="info-text">Если вам требуется помощь дежурного травматолога, воспользуйтесь кнопкой справа от экрана.</p>
+      <img src="img/error.svg" alt="Toggle Icon" class="svg__eror-icon" />
+      <p class="info-text">Нашли ошибку? Cообщите нам.</p>
+      <p class="info-text">it@cito-priorov.ru.</p>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="script.js"></script>
+    </div>
+  </div>
+
+  
+
+
+    <div class="route-buttons" id="route-buttons">
+    
+      
+      <button class="btn none" id="showRouteButton">Показать тестовый маршрут</button>
+        <button class="btn " id="chief"><div class="btn__text"><p>Дирекция /<br>Отдел главного врача</p><p class="korp">Корпус 6, подъезд 3</p></div></button>
+        <button class="btn " id="AdultСlinic"><div class="btn__text"><p>Взрослая поликлиника</p><p class="korp">Корпус 1</p></div></button>
+        <button class="btn " id="hospitalizationWaitingRoom"><div class="btn__text"><p>Зал ожидания госпитализации</p><p class="korp">Корпус 5</p></div></button>
+        <button class="btn " id="adultReceptionDepartment"><div class="btn__text"><p>Взрослое приемное отделение</p><p class="korp">Корпус 6, подъезд 1</p></div></button>
+        <button class="btn none" id="mainBuilding"><div class="btn__text"><p>Главный корпус</p><p class="korp">Корпус 6, подъезд 2</p></div></button>
+        <button class="btn " id="childrenDepartment"><div class="btn__text"><p>Детское приемное отделение (поликлиника)</p><p class="korp">Корпус 7, подъезд 9</p></div></button>
+        <div class="education ">
+          <button class="btn" id="education-info"><div class="btn__text"><p>Управление по образовательной деятельности</p><p class="korp">Корпус 10, подъезд 7</p></div></button>
+          <div class="education-content hidden">
+            <div class="qr qr-education"><img style="width: 150px;" src="./img/qr-education.png" alt=""></div>
+            <p class="education-info__text"><b>Ординатура. Аспирантура. ДПО</b>. Очное обучение, стажировки на рабочем месте, симуляционные тренинги и кадаверные курсы.</p>
+            <div class="education-info__phone-wrap">
+              <img style="width: 30px;" src="./img/education-phone.png" alt="">
+              <p>+7 (499) 153-12-42</p>
+            </div>
+            <div class="education-info__mail-wrap">
+              <svg class="education-info-svg" width="30" viewBox="0 0 20 20">
+                <use href="./img/education-mail.svg#mail"></use>
+              </svg>
+              <p>edu@cito-priorov.ru</p>
+            </div>
+            <div class="education-info__address-wrap">
+              <img style="height: 33.33px; width: 25px;" src="./img/educaton-address.png" alt="">
+              <p>г. Москва, ул. Приорова, д. 10, 
+                подъезд 7, 2 этаж, кабинет 211</p>
+            </div>
+            <button class=" btn btn-test" id="education">Построить маршрут</button>
+          </div>
+        </div>
+
+    </div>
+    <div id="map"></div>
+    
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
