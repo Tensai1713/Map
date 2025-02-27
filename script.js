@@ -129,7 +129,7 @@ let endMarker = null;
 const routes = {};
 
 function interpolatePoints(points, steps) {
-    const interpolated = [];
+    let interpolated = [];
     for (let i = 0; i < points.length - 1; i++) {
         const start = points[i];
         const end = points[i + 1];
@@ -144,7 +144,7 @@ function interpolatePoints(points, steps) {
     return interpolated;
 }
 
-for (const key in routeCoords) {
+for (let key in routeCoords) {
     routes[key] = {
         coords: interpolatePoints(routeCoords[key], 20),
         polyline: L.polyline([], { color: 'blue', opacity: 0.5 }).addTo(map)
@@ -182,7 +182,7 @@ function animateRoute(routeKey) {
 
     map.setView(initialFocus, initialZoom);
 
-    for (const key in routes) {
+    for (let key in routes) {
         routes[key].polyline.setLatLngs([]);
     }
 
@@ -229,7 +229,7 @@ function resetMap() {
         endMarker = null;
     }
 
-    for (const key in routes) {
+    for (let key in routes) {
         routes[key].polyline.setLatLngs([]);
     }
 
@@ -240,7 +240,7 @@ function resetMap() {
 let inactivityTimer = null;
 let hideCount = 0; 
 function showInactivityScreen() {
-    document.querySelector('#inactivity-screen').classList.remove('hidden');
+    document.getElementById('inactivity-screen').classList.remove('hidden');
     hideCount++;
     document.querySelector('.counter').textContent = `${hideCount}`;
     hideAllSections(); 
@@ -248,7 +248,7 @@ function showInactivityScreen() {
 }
 
 function hideInactivityScreen() {
-    document.querySelector('#inactivity-screen').classList.add('hidden');  
+    document.getElementById('inactivity-screen').classList.add('hidden');  
 }
 
 function resetInactivityTimer() {
@@ -267,6 +267,7 @@ document.querySelector("#toggleButton").addEventListener("click", function() {
     const infoContent = document.querySelector(".info__content");
     const infoTitle = document.querySelector('.info__title');
     const svgIcon = document.querySelector('.svg__icon');
+    const svgError = document.querySelector('.svg__eror-icon')
 
     infoWrap.classList.toggle("active");
     infoContent.classList.toggle("active");
@@ -274,13 +275,18 @@ document.querySelector("#toggleButton").addEventListener("click", function() {
     if (infoTitle.classList.contains('hidden')) {
         infoTitle.classList.remove('hidden');
         infoTitle.classList.add('visible');
+        svgError.classList.add('active');
     } else {
         infoTitle.classList.remove('visible');
         infoTitle.classList.add('hidden');
+        svgError.classList.remove('active');
     }
 
     svgIcon.classList.toggle('flipped');
+    
 });
+
+
 
 function hideAllSections() {
   hideEducationContent(); 
@@ -311,10 +317,11 @@ function hideInfo() {
 
 document.addEventListener('click', function(event) {
     const infoWrap = document.querySelector(".info__wrap");
-    if (infoWrap.classList.contains("active") && !infoWrap.contains(event.target) && event.target !== document.querySelector("#toggleButton")) {
+    if (infoWrap.classList.contains("active") && !infoWrap.contains(event.target) && event.target !== document.getElementById("toggleButton")) {
         hideInfo();
     }
 });
+
 
 document.querySelector('#education-info').addEventListener('click', function() {
   const educationContent = document.querySelector('.education-content');
@@ -329,6 +336,7 @@ document.querySelector('#education-info').addEventListener('click', function() {
   hideInfo();
 });
 
+// кнопка для разработки нового маршрута
 document.querySelector('#showRouteButton').addEventListener('click', () => {
   const routeKey = 'education'; 
   resetMap(); 
@@ -344,6 +352,7 @@ document.querySelector('#showRouteButton').addEventListener('click', () => {
   map.setView(endCoords, map.getZoom());
 });
 
+
 function getMonthWithDeclension(monthIndex) {
   const monthGenitive = {
       1: "января",  2: "февраля", 3: "марта", 
@@ -352,30 +361,36 @@ function getMonthWithDeclension(monthIndex) {
       10: "октября",11: "ноября", 12: "декабря"
   };
 
-  return monthGenitive[monthIndex];
+  return monthGenitive[monthIndex]; // Возвращаем название месяца в родительном падеже
 }
 
 function updateTime() {
-  const today = new Date();
+  let today = new Date();
   
+  // Форматирование времени
   let hours = today.getHours();
   let minutes = today.getMinutes();
   
   hours = hours < 10 ? "0" + hours : hours;
   minutes = minutes < 10 ? "0" + minutes : minutes;
   
+  // Форматирование даты
   const daysOfWeek = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
   
-  const dayOfWeek = daysOfWeek[today.getDay()];
-  const day = today.getDate();
-  const monthIndex = today.getMonth() + 1;
-  const monthDeclension = getMonthWithDeclension(monthIndex);
+  let dayOfWeek = daysOfWeek[today.getDay()];
+  let day = today.getDate();
+  let monthIndex = today.getMonth() + 1; // Месяцы начинаются с нуля
+  
+  let monthDeclension = getMonthWithDeclension(monthIndex);
   
   document.querySelector('#time').innerHTML = hours + ":" + minutes;
   document.querySelector('#date').innerHTML = `${dayOfWeek}, ${day} ${monthDeclension}`;
 }
 
 setInterval(updateTime, 1000);
+
+
+
 
 document.querySelector('#chief').addEventListener('click', () => { animateRoute('chief'); hideInfo(); hideAllSections(); });
 document.querySelector('#hospitalizationWaitingRoom').addEventListener('click', () => { animateRoute('hospitalizationWaitingRoom'); hideInfo(); hideAllSections(); });

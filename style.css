@@ -44,6 +44,8 @@ ul {
   margin-bottom: 10px;
 }
 
+
+
 .qr {
   width: 150px;
   margin: auto;
@@ -51,7 +53,8 @@ ul {
 }
 
 .qr-education {
-  margin-top: 30px;
+  margin: 0;
+  margin-top: 20px;
 }
 
 .leaflet-control-attribution {
@@ -61,6 +64,22 @@ ul {
 .svg__icon {
   width: 70px;
   transition: transform 0.8s ease; 
+}
+
+.svg__eror-icon {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  
+}
+.svg__eror-icon.active {
+  transition: opacity 0.8s;
+  opacity: 1;
+}
+
+.info__content.active p:nth-child(7) {
+  margin-top: 50px;
 }
 
 .svg__icon.flipped {
@@ -93,6 +112,7 @@ ul {
 }
 
 .info__content {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -170,6 +190,7 @@ ul {
   color: #2b86cd;
 }
 
+
 #inactivity-screen {
   position: fixed;
   top: 0;
@@ -230,8 +251,9 @@ ul {
 }
 
 .date {
-  font-size: 60px;
+  font-size: 60px
 }
+
 
 .snowman::before {
   content: url("./img/LH.svg");
@@ -251,20 +273,21 @@ ul {
 
 @keyframes swingleft {
   0% {
-      transform: rotate(0deg); 
+    transform: rotate(0deg); 
   }
   100% {
-      transform: rotate(-30deg);
+    transform: rotate(-30deg);
   }
 }
 @keyframes swingright {
   0% {
-      transform: rotate(0deg); 
+    transform: rotate(0deg); 
   }
   100% {
-      transform: rotate(30deg);
+    transform: rotate(30deg);
   }
 }
+
 
 #inactivity-screen.hidden {
   display: none; 
@@ -304,7 +327,6 @@ ul {
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin-top: -40px;
   z-index: -1;
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -313,6 +335,8 @@ ul {
   gap: 15px;
 }
 
+
+
 .education-content.active {
   max-height: 1000px;
 }
@@ -320,8 +344,11 @@ ul {
 .education-info__text {
   max-width: 250px;
   text-align: center;
+  
   padding-bottom: 10px;
 }
+
+
 
 .education-info__phone-wrap {
   display: flex;
@@ -341,7 +368,7 @@ ul {
 
 .education-info__address-wrap p {
   max-width: 175px;
-  text-align: center;
+  text-align:center;
 }
 
 .background-video {
@@ -365,7 +392,11 @@ ul {
 }
 
 
-@media (max-width: 1920px) {
+@media (max-width:2048px) {
+  .date-time {
+    top: 70px;
+  }
+  
   .time {
     font-size: 100px;
   }
@@ -374,12 +405,26 @@ ul {
     font-size: 30px;
   }
 
-  .date-time {
-    top: 100px;
-  }
-
   .message {
     font-size: 30px;
   }
+}
+
+
+@media (width:1080px) {
+  .date-time {
+    top: 250px;
+  }
   
+  .time {
+    font-size: 250px;
+  }
+  
+  .date {
+    font-size: 60px
+  }
+
+  .message {
+    font-size: 50px;
+  }
 }
